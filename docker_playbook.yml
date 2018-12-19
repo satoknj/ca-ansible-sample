@@ -1,0 +1,6 @@
+---
+- hosts: test_servers
+  connection: docker
+  roles:
+    - { role: common, tags: ['common']} 
+    - { role: ca, tags: ['ca']} 

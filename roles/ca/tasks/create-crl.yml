@@ -1,0 +1,13 @@
+- name: put serial file
+  copy:
+    src: crlnumber
+    dest: "{{ ca_root }}/crlnumber"
+    owner: root
+    group: root
+- name: generate client key and crt
+  shell: "{{ item }}"
+  args:
+    executable: /bin/bash
+    chdir: "{{ ca_root }}"
+  with_items:
+    - "openssl ca -gencrl -keyfile private/ca.key -cert ca.crt -out revoke.crl"

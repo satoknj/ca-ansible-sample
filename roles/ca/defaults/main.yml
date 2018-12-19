@@ -1,0 +1,4 @@
+ca_init: false
+create_server_crt: false
+create_client_crt: false
+create_crl: false

@@ -1,0 +1,9 @@
+version: '3'
+services:
+  centos:
+    image: centos:6.6
+    ports:
+      - "10050:80"
+      - "10051:443"
+    privileged: true
+    command: /sbin/init

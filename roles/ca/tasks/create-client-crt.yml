@@ -1,0 +1,23 @@
+- name: delete client crt dir
+  file:
+    path: "{{ client_crt_root }}"
+    state: absent
+- name: remake client crt dir
+  file:
+    path: "{{ client_crt_root }}"
+    state: directory
+    owner: root
+    group: root
+- name: set client setting
+  set_fact:
+    client_subj: "/C=JP/ST=Tokyo/L=Minato-ku/O=Company/OU=Dep/CN=client"
+- name: generate client key and crt
+  shell: "{{ item }}"
+  args:
+    executable: /bin/bash
+    chdir: "{{ client_crt_root }}"
+  with_items:
+    - "openssl genrsa -out client.key 2048 -sha256"
+    - "openssl req -new -key client.key -out client.csr -sha256 -subj \"{{ client_subj }}\""
+    - "openssl x509 -req -sha256 -days 3650 -CA {{ca_root}}/ca.crt -CAkey {{ca_root}}/private/ca.key -CAcreateserial -in client.csr -out client.crt"
+    - "openssl pkcs12 -export -out client.p12 -inkey client.key -in client.crt -password pass:password"

@@ -1,0 +1,5 @@
+ca_root: /etc/pki/CA
+server_crt_root: /etc/ssl/server
+server_name: sample.my.ca
+client_crt_root: /etc/ssl/client
+download_page_location: /usr/local/apache2/htdocs_cert

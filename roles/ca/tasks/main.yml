@@ -1,0 +1,12 @@
+- name: create ca
+  import_tasks: init-ca.yml
+  when: ca_init
+- name: create server certificate
+  import_tasks: create-server-crt.yml
+  when: ca_init or create_server_crt
+- name: create client certificate
+  import_tasks: create-client-crt.yml
+  when: ca_init or create_client_crt
+- name: create crl
+  import_tasks: create-crl.yml
+  when: ca_init or create_crl

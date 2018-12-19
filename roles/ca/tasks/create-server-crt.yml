@@ -1,0 +1,23 @@
+- name: delete server crt dir
+  file:
+    path: "{{ server_crt_root }}"
+    state: absent
+- name: remake server crt dir
+  file:
+    path: "{{ server_crt_root }}"
+    state: directory
+    owner: root
+    group: root
+- name: set server setting
+  set_fact:
+    server_subj: "/C=JP/ST=Tokyo/L=Minato-ku/O=Company/OU=Dep/CN={{ server_name }}"
+    san_config: "<(cat /etc/pki/tls/openssl.cnf  <(printf \"[SAN]\\n subjectAltName=DNS:{{ server_name }}\"))"
+- name: generate server key and crt
+  shell: "{{ item }}"
+  args:
+    executable: /bin/bash
+    chdir: "{{ server_crt_root }}"
+  with_items:
+    - "openssl genrsa -out server.key 2048 -sha256"
+    - "openssl req -new -key server.key -out server.csr -sha256 -subj \"{{ server_subj }}\" -reqexts SAN -extensions SAN -config {{ san_config }}"
+    - "openssl x509 -req -sha256 -days 3650 -CA {{ca_root}}/ca.crt -CAkey {{ca_root}}/private/ca.key -CAcreateserial -in server.csr -out server.crt -extensions SAN -extfile {{ san_config }}"

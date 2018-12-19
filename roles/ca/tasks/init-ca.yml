@@ -1,0 +1,40 @@
+- name: delete ca root
+  file:
+    path: "{{ ca_root }}"
+    state: absent
+# セキュリティ上はprivateディレクトリは700にしたほうが良いがここでは省略
+- name: remake ca root
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+  with_items:
+    - "{{ ca_root }}"
+    - "{{ ca_root }}/certs"
+    - "{{ ca_root }}/private"
+    - "{{ ca_root }}/crl"
+    - "{{ ca_root }}/newcerts"
+- name: put serial file
+  copy:
+    src: serial
+    dest: "{{ ca_root }}/serial"
+    owner: root
+    group: root
+- name: create index file
+  file:
+    path: "{{ ca_root }}/index.txt"
+    state: touch
+    owner: root
+    group: root
+- name: set ca subject var
+  set_fact:
+    ca_subject: '/C=JP/ST=Tokyo/L=Minato-ku/O=Company/OU=Dep/CN=sample.my.ca'
+# 簡易的に構築するためパスフレーズは設定しない
+- name: generate private key and root CA file
+  shell: "{{ item }}"
+  args:
+    chdir: "{{ ca_root }}"
+  with_items:
+    - "openssl genrsa -out private/ca.key 2048"
+    - "openssl req -new -x509 -days 3650 -key private/ca.key -out ca.crt -subj \"{{ ca_subject }}\""

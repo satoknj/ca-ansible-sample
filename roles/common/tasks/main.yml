@@ -1,0 +1,5 @@
+- name: install common softwares
+  yum: name={{ item }} state=latest
+  with_items:
+    - vim
+    - openssl
